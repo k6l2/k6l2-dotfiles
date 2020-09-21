@@ -1,4 +1,6 @@
 syntax on
+" language-aware auto-complete shortcut (Visual Studio style)
+inoremap <C-Space> <C-x><C-o>
 " easily escape from INSERT mode without reaching to the ESC key
 :map! jk <ESC>
 " swap : & ; so I don't have to keep pressing shift all the time
