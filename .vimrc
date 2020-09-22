@@ -1,6 +1,12 @@
 syntax on
 " language-aware auto-complete shortcut (Visual Studio style)
 inoremap <C-Space> <C-x><C-o>
+" easy buffer cycling with C-PageUp & C-PageDown
+nnoremap <C-PageUp> :bp<cr>
+nnoremap <C-PageDown> :bn<cr>
+" \b => easier buffer swapping
+" source: https://vi.stackexchange.com/a/2187
+nnoremap <Leader>b :ls<CR>:b<Space>
 " easily escape from INSERT mode without reaching to the ESC key
 :map! jk <ESC>
 " swap : & ; so I don't have to keep pressing shift all the time
@@ -9,6 +15,8 @@ nnoremap : ;
 " close buffer without closing a split window
 " source: https://stackoverflow.com/a/29179159/4526664
 command Bd bp<bar>bd #
+" \w => close buffer without closing split window
+:nnoremap <Leader>w :Bd<cr>
 " open a vertical split window of the current working directory
 command Dir vert sp<bar>E<bar>vert resize 40
 " highlight everything past column 80
