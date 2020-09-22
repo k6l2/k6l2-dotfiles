@@ -24,7 +24,7 @@
 # User dependent .bash_profile file
 
 #reset path to original value:
-PATH="$(getconf PATH):./"
+PATH="$(getconf PATH):./:${ORIGINAL_PATH}"
 
 # source the users bashrc if it exists
 if [ -f "${HOME}/.bashrc" ] ; then
@@ -46,7 +46,14 @@ fi
 # if [ -d "${HOME}/info" ]; then
 #   INFOPATH="${HOME}/info:${INFOPATH}"
 # fi
-cd /cygdrive/c
+
+# set current working directory conditionally
+if [[ -z "${project_root}" ]]; then
+	cd /cygdrive/c
+else
+	cd ${project_root}
+fi
+#cd /cygdrive/c
 alias hlog='git log --date-order --all --graph --format="%C(green)%h %C(yellow)%an %C(blue bold)%ar %Creset%s     %C(red bold)%d"'
 alias gitstatus='git fetch; hlog -20; git status'
 alias desk='cd /cygdrive/c/Users/ssjme/Desktop'
