@@ -45,3 +45,36 @@ set autoindent smartindent
 set smarttab
 set number relativenumber
 set tabstop=4 shiftwidth=4
+" VS-like build hotkey
+noremap <F7> :call BuildBatch()<CR>
+function BuildBatch()
+	if exists('g:jobBuild')
+		echo 'build job already running!'
+		return 1
+	endif
+	let g:jobBuild = job_start(
+		\ "build.bat", 
+		\ {'out_io': 'buffer', 'out_name':'/tmp/vim_build_job_output', 
+		\  'close_cb': 'OnJobBuildClose'})
+	echo 'build job started!'
+endfunction
+function OnJobBuildClose(channel)
+	echo 'build job closed!'
+	unlet g:jobBuild
+endfunction
+" VSCode-like display of the build job's output
+function ToggleBuildJobOutput()
+	let bufferWindowNumber = bufwinnr('/tmp/vim_build_job_output')
+	if bufferWindowNumber == -1
+		:split
+		:resize 10
+		:edit /tmp/vim_build_job_output
+		normal! G
+	else
+		" go to the split window containing the build job output buffer
+		execute bufferWindowNumber.'wincmd w'
+		" ...and close it
+		quit!
+	endif
+endfunction
+noremap <C-`> :call ToggleBuildJobOutput()<CR>
