@@ -23,6 +23,9 @@
 
 # User dependent .bash_profile file
 
+#sanitize $project_root in case it is still a windows path
+project_root=$(cygpath $project_root)
+
 #reset path to original value:
 PATH="$(getconf PATH):./:${ORIGINAL_PATH}"
 
