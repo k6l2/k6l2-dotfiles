@@ -23,10 +23,11 @@
 
 # User dependent .bash_profile file
 
-#sanitize $project_root in case it is still a windows path
-project_root=$(cygpath $project_root)
+# the cygwin path of the project_root is needed for launching programs from this
+# directory from within vim
+export project_root_cygpath=$(cygpath $project_root)
 
-#reset path to original value:
+# reset path to original value:
 PATH="$(getconf PATH):./:${ORIGINAL_PATH}"
 
 # source the users bashrc if it exists
