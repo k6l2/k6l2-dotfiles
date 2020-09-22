@@ -72,9 +72,16 @@ function ToggleBuildJobOutput()
 		normal! G
 	else
 		" go to the split window containing the build job output buffer
-		execute bufferWindowNumber.'wincmd w'
-		" ...and close it
-		quit!
+		:execute bufferWindowNumber.'wincmd w'
+		" ...and close it without losing buffer contents
+		:close
 	endif
 endfunction
 noremap <C-`> :call ToggleBuildJobOutput()<CR>
+" VS-like RUN hotkey
+function RunBuild()
+	let exePath = $project_root . "/build/" . $kmlApplicationName . ".exe"
+	call job_start(exePath) 
+endfunction
+noremap <F5> :call RunBuild()<CR>
+
