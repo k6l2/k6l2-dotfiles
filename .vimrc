@@ -73,17 +73,26 @@ function BuildBatch()
 	silent wall
 	echo 'KML project build job ...'
 	" while we're at it, we can just generate the ctags for the project ~
-	call job_start('ctags -R $kml_home_cygpath/code* ' . 
-		\ '$project_root_cygpath/code*')
+	" @TODO: why can I not just pass "expand('$kml_home_cygpath').'/code*'"
+	"        here instead of having to specify each directory individually??
+	call job_start(['ctags', '-R', '--totals', 
+		\ expand('$kml_home_cygpath').'/code', 
+		\ expand('$kml_home_cygpath').'/code-utilities', 
+		\ expand('$project_root_cygpath').'/code'])
 	" actually start the job which will run the KML build script
 	let g:jobBuild = job_start(
-		\ "build.bat", 
+		\ 'build.bat', 
 		\ {'out_io': 'buffer', 'out_name':'/tmp/vim_build_job_output', 
 		\  'close_cb': 'OnJobBuildClose'})
 endfunction
 function OnJobBuildClose(channel)
 	echo 'KML project build job ... DONE.'
 	unlet g:jobBuild
+	" play a happy sound once we're done~~~
+	" source: https://stackoverflow.com/a/14678671/4526664
+	let powershellArg = "(New-Object Media.SoundPlayer " . 
+		\ "'c:/Windows/Media/tada.wav').PlaySync();"
+	call job_start(['powershell','-c',powershellArg])
 endfunction
 " }}} build hotkey
 " VSCode-like display of the build job's output -----------------------------{{{
