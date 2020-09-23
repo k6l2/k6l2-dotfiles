@@ -23,6 +23,20 @@
 
 # User dependent .bash_profile file
 
+# convert INCLUDE environment variable to a list of cygwin paths
+# source: https://stackoverflow.com/q/918886/4526664
+include_cygpaths=""
+OIFS=$IFS
+IFS=';'
+includePathList=$INCLUDE
+include_cygpaths_separator=''
+for includePath in $includePathList; do
+	include_cygpaths="$include_cygpaths$include_cygpaths_separator$(cygpath $includePath)"
+	include_cygpaths_separator=';'
+done
+IFS=$OIFS
+export include_cygpaths
+
 # the cygwin path of the project_root is needed for launching programs from this
 # directory from within vim
 export project_root_cygpath=$(cygpath $project_root)
