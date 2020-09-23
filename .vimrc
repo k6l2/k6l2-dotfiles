@@ -36,7 +36,9 @@ set list
 highlight StrangeWhitespace guibg=Red ctermbg=Red
 " The list is from https://stackoverflow.com/a/37903645 
 " (with `\t`, `\n`, ` `, `\xa0` removed):
-call matchadd('StrangeWhitespace', '[\x0b\x0c\r\x1c\x1d\x1e\x1f\x85\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]')
+call matchadd('StrangeWhitespace', '[\x0b\x0c\r\x1c\x1d\x1e\x1f\x85\u1680' . 
+	\ '\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a' . 
+	\ '\u2028\u2029\u202f\u205f\u3000]')
 " MISC. settings...
 set scrolloff=5
 set undolevels=1000
@@ -52,11 +54,11 @@ function BuildBatch()
 		echo 'build job already running!'
 		return 1
 	endif
+	echo 'Starting build job ...'
 	let g:jobBuild = job_start(
 		\ "build.bat", 
 		\ {'out_io': 'buffer', 'out_name':'/tmp/vim_build_job_output', 
 		\  'close_cb': 'OnJobBuildClose'})
-	echo 'build job started!'
 endfunction
 function OnJobBuildClose(channel)
 	echo 'build job closed!'
@@ -80,8 +82,11 @@ endfunction
 noremap <C-`> :call ToggleBuildJobOutput()<CR>
 " VS-like RUN hotkey
 function RunBuild()
-	let exePath = $project_root_cygpath . "/build/" . $kmlApplicationName . ".exe"
-	call job_start(exePath) 
+	" while we're at it, we can just generate the ctags for the project ~
+	call job_start('ctags -R $kml_home_cygpath/code* ' . 
+		\ '$project_root_cygpath/code*')
+	call job_start($project_root_cygpath . "/build/" . 
+		\ $kmlApplicationName . ".exe") 
 endfunction
 noremap <F5> :call RunBuild()<CR>
 

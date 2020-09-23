@@ -27,6 +27,9 @@
 # directory from within vim
 export project_root_cygpath=$(cygpath $project_root)
 
+# the cygwin path of KML is needed for running ctags
+export kml_home_cygpath=$(cygpath $KML_HOME)
+
 # reset path to original value:
 PATH="$(getconf PATH):./:${ORIGINAL_PATH}"
 
