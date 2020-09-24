@@ -75,10 +75,16 @@ function BuildBatch()
 	" while we're at it, we can just generate the ctags for the project ~
 	" @TODO: why can I not just pass "expand('$kml_home_cygpath').'/code*'"
 	"        here instead of having to specify each directory individually??
-	call job_start(['ctags', '-R', '--totals', 
-		\ expand('$kml_home_cygpath').'/code', 
-		\ expand('$kml_home_cygpath').'/code-utilities', 
-		\ expand('$project_root_cygpath').'/code'])
+	" @TODO: separate the microsoft includes from KML includes, check to see
+	"        if the microsoft includes have been tagged, if they haven't then
+	"        make the tag file, otherwise just make the KML tag file by
+	"        appending it to the existing microsoft tag file???
+	"let includePathList = split(expand('$include_cygpaths'),';')
+	let includePathList = 
+		\[ expand('$kml_home_cygpath')    . '/code'
+		\, expand('$kml_home_cygpath')    . '/code-utilities'
+		\, expand('$project_root_cygpath'). '/code' ]
+	call job_start(['ctags', '-R', '--totals'] + includePathList)
 	" actually start the job which will run the KML build script
 	let g:jobBuild = job_start(
 		\ 'build.bat', 
@@ -119,10 +125,8 @@ endfunction
 " VS-like RUN hotkey --------------------------------------------------------{{{
 noremap <F5> :call RunBuild()<CR>
 function RunBuild()
-	" @TODO: figure out if it's possible to just start the application inside
-	" the visual studio debugger...
-	call job_start($project_root_cygpath . "/build/" . 
-		\ $kmlApplicationName . ".exe") 
+	call job_start(['autohotkey',
+		\$KML_HOME . '/misc/debug-in-visual-studio.ahk'])
 endfunction
 " }}} run program hotkey
 
