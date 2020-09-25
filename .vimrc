@@ -47,6 +47,8 @@ set autoindent smartindent
 set smarttab
 set number relativenumber
 set tabstop=4 shiftwidth=4
+" ignore case when performing string searches
+set ignorecase
 " VS-like build hotkey ------------------------------------------------------{{{
 noremap <F7> :call BuildBatch()<CR>
 function BuildBatch()
@@ -86,18 +88,42 @@ function BuildBatch()
 		\, expand('$project_root_cygpath'). '/code' ]
 	call job_start(['ctags', '-R', '--totals'] + includePathList)
 	" actually start the job which will run the KML build script
+	let g:jobBuildExitStatus = 0
 	let g:jobBuild = job_start(
 		\ 'build.bat', 
 		\ {'out_io': 'buffer', 'out_name':'/tmp/vim_build_job_output', 
-		\  'close_cb': 'OnJobBuildClose'})
+		\  'close_cb': 'OnJobBuildClose', 'err_cb': 'OnJobBuildError', 
+		\  'exit_cb': 'OnJobBuildExit'})
+endfunction
+" this function seems extremely useless since exitStatus appears to always
+" return 0
+function OnJobBuildExit(job, exitStatus)
+	" echom "Build job exitStatus=".a:exitStatus
+endfunction
+function OnJobBuildError(channel, message)
+	" echom "Build job error message:'".a:message."'"
+	" search stderr output for a magic string telling us that KML failed to
+	" build, because apparently getting the exit status of the build batch
+	" script doesn't seem to work... ugh.
+	if stridx(a:message, "KML build failed!") > -1
+		" echom "-----------build failure detected!--------------"
+		let g:jobBuildExitStatus = 1
+	endif
 endfunction
 function OnJobBuildClose(channel)
-	echo 'KML project build job ... DONE.'
+	echo "KML project build job ... DONE. (exit status=" . 
+		\g:jobBuildExitStatus . ")"
 	unlet g:jobBuild
-	" play a happy sound once we're done~~~
-	" source: https://stackoverflow.com/a/14678671/4526664
-	let powershellArg = "(New-Object Media.SoundPlayer " . 
-		\ "'c:/Windows/Media/tada.wav').PlaySync();"
+	if g:jobBuildExitStatus == 0
+		" play a happy sound once we're done~~~
+		" source: https://stackoverflow.com/a/14678671/4526664
+		let powershellArg = "(New-Object Media.SoundPlayer " . 
+			\ "'c:/Windows/Media/tada.wav').PlaySync();"
+	else
+		" play a sad sound if build failed :(
+		let powershellArg = "(New-Object Media.SoundPlayer " . 
+			\ "'c:/Windows/Media/Windows Critical Stop.wav').PlaySync();"
+	endif
 	call job_start(['powershell','-c',powershellArg])
 endfunction
 " }}} build hotkey
