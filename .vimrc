@@ -1,6 +1,9 @@
 syntax on
 " language-aware auto-complete shortcut (Visual Studio style)
-inoremap <C-Space> <C-x><C-o>
+"inoremap <C-Space> <C-x><C-o>
+" conditional auto-complete 
+" source: https://vi.stackexchange.com/a/14977
+inoremap <expr> <Tab> getline('.')[col('.') - 2] =~ '\a' ? "\<C-p>" : "\<Tab>"
 " easy buffer cycling with C-PageUp & C-PageDown
 nnoremap <C-PageUp> :bp!<cr>
 nnoremap <C-PageDown> :bn!<cr>
@@ -115,11 +118,14 @@ function OnJobBuildClose(channel)
 		\g:jobBuildExitStatus . ")"
 	unlet g:jobBuild
 	if g:jobBuildExitStatus == 0
+		echo "KML project build job ... COMPLETE!" 
 		" play a happy sound once we're done~~~
 		" source: https://stackoverflow.com/a/14678671/4526664
 		let powershellArg = "(New-Object Media.SoundPlayer " . 
 			\ "'c:/Windows/Media/tada.wav').PlaySync();"
 	else
+		echo "KML project build job ... FAILED... " . 
+			\"see '/tmp/vim_build_job_output' buffer for info!" 
 		" play a sad sound if build failed :(
 		let powershellArg = "(New-Object Media.SoundPlayer " . 
 			\ "'c:/Windows/Media/Windows Critical Stop.wav').PlaySync();"
