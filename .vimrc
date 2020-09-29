@@ -61,21 +61,45 @@ function BuildBatch()
 	endif
 	" before writing all buffers to disk, clear the previous contents of the 
 	" temp build output buffer
-	if bufexists('/tmp/vim_build_job_output')
-		" @TODO: just close the buffer & discard changes if the buffer is not
-		"        currently open in a window to remove the need to write an
-		"        empty temp file
-		let alreadyInBuildOutput = (@% ==# '/tmp/vim_build_job_output')
-		if !alreadyInBuildOutput
-			silent buffer! /tmp/vim_build_job_output
-		endif
-		silent %delete
-		if !alreadyInBuildOutput
-			silent buffer! #
+	let bufferWindowNumber = bufwinnr('/tmp/vim_build_job_output')
+	if buflisted('/tmp/vim_build_job_output')
+		" just close the buffer & discard changes to remove the need to write an 
+		" empty temp file
+		" @TODO: preserve the "previous" buffer memory so that <C-6> still
+		"        takes you back to the correct previous buffer after a build
+		if bufferWindowNumber == -1
+			" if the buffer isn't open in a window, we can just discard it!
+			silent bdelete! /tmp/vim_build_job_output
+		else
+			" otherwise: 
+			"	- switch to the buffer window
+			"	- change to a new buffer
+			"	- delete the buffer
+			"	- switch to the previous window
+			execute bufferWindowNumber.'wincmd w'
+			silent bNext!
+			silent bdelete! /tmp/vim_build_job_output
+			wincmd p
 		endif
 	endif
 	" before starting a build, write all the buffers to disk
 	silent wall
+	" create a new buffer to hold the output of the build job
+	silent edit /tmp/vim_build_job_output
+	" return to the previous buffer
+	silent buffer! #
+	" if the build job output buffer was previously in a window before being
+	" deleted, let's bring it back
+	if bufferWindowNumber != -1
+		" go to the split window which contained the build job output buffer
+		execute bufferWindowNumber.'wincmd w'
+		" open the build job output buffer
+		silent buffer /tmp/vim_build_job_output
+		" scroll all the way to the bottom of the buffer
+		normal! G
+		" go back to the previous window
+		wincmd p
+	endif
 	echo 'KML project build job ...'
 	" while we're at it, we can just generate the ctags for the project ~
 	" @TODO: why can I not just pass "expand('$kml_home_cygpath').'/code*'"
