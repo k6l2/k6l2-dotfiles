@@ -148,8 +148,16 @@ function OnJobBuildClose(channel)
 		let powershellArg = "(New-Object Media.SoundPlayer " . 
 			\ "'c:/Windows/Media/tada.wav').PlaySync();"
 	else
+		" make sure the build output buffer can be saved as a file & save
+		" everything
+		call setbufvar('/tmp/vim_build_job_output', '&buftype', '')
+		silent wall
 		echo "KML project build job ... FAILED... " . 
 			\"see '/tmp/vim_build_job_output' buffer for info!" 
+		" Now that we have the build output as a file, we can load it as a
+		" quickfile error file.  This will also automatically move us to the
+		" first error & display it at the bottom of the vim screen!
+		cfile /tmp/vim_build_job_output
 		" play a sad sound if build failed :(
 		let powershellArg = "(New-Object Media.SoundPlayer " . 
 			\ "'c:/Windows/Media/Windows Critical Stop.wav').PlaySync();"
