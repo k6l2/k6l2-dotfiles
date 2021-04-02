@@ -43,6 +43,7 @@ call matchadd('StrangeWhitespace', '[\x0b\x0c\r\x1c\x1d\x1e\x1f\x85\u1680' .
 	\ '\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a' . 
 	\ '\u2028\u2029\u202f\u205f\u3000]')
 " MISC. settings...
+set hlsearch
 set scrolloff=5
 set undolevels=1000
 set nocompatible
@@ -50,6 +51,12 @@ set autoindent smartindent
 set smarttab
 set number relativenumber
 set tabstop=4 shiftwidth=4
+" do not break words when wrapping text
+set linebreak
+" place wrapped text lines at the same indentation level as their parent
+set breakindent
+" shift the wrapped text lines over by 4 characters
+set breakindentopt=shift:4
 " ignore case when performing string searches
 set ignorecase
 " VS-like build hotkey ------------------------------------------------------{{{
