@@ -13,7 +13,7 @@ fi
 #else
 #	cd ${project_root}
 #fi
-cd ~
+#cd ~
 # custom aliases
 alias hlog='git log --date-order --all --graph --format="%C(green)%h %C(yellow)%an %C(blue bold)%ar %Creset%s     %C(red bold)%d"'
 alias gitstatus='git fetch; hlog -20; git status'
