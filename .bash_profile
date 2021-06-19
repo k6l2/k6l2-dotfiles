@@ -14,6 +14,19 @@ fi
 #	cd ${project_root}
 #fi
 #cd ~
+# display a user & put password in clipboard for an encrypted csv file
+function kpass
+{
+	temp_entry=$(\
+		gpg -d "$USERPROFILE/Google Drive/lp-export.csv.gpg" \
+		| grep -m 1 "$1")
+	# print out site
+	echo $temp_entry | awk -F, '{print $1}'
+	# print out user name
+	echo $temp_entry | awk -F, '{print $2}'
+	# copy password to clipboard
+	echo $temp_entry | awk -F, '{print $3}' | clip
+}
 # custom aliases
 alias hlog='git log --date-order --all --graph --format="%C(green)%h %C(yellow)%an %C(blue bold)%ar %Creset%s     %C(red bold)%d"'
 alias gitstatus='git fetch; hlog -20; git status'
