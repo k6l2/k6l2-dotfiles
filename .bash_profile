@@ -26,6 +26,9 @@ function kpass
 	echo $temp_entry | awk -F, '{print $2}'
 	# copy password to clipboard
 	echo $temp_entry | awk -F, '{print $3}' | clip
+	# clear the GPG cache, otherwise we can just decrypt the file later without 
+	#     asking the user for a password! (https://askubuntu.com/a/1093850)
+	gpg-connect-agent reloadagent /bye
 }
 # custom aliases
 alias hlog='git log --date-order --all --graph --format="%C(green)%h %C(yellow)%an %C(blue bold)%ar %Creset%s     %C(red bold)%d"'
